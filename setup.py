@@ -200,6 +200,7 @@ EMIT_BUILD_WARNING = False
 RERUN_CMAKE = False
 CMAKE_ONLY = False
 filtered_args = []
+# 一下参数正确的使用方法：python setup.py install --cmake-only
 for i, arg in enumerate(sys.argv):
     if arg == '--cmake':
         RERUN_CMAKE = True
@@ -746,9 +747,22 @@ if __name__ == '__main__':
                      "Python with strong GPU acceleration"),
         long_description=long_description,
         long_description_content_type="text/markdown",
-        ext_modules=extensions,
-        cmdclass=cmdclass,
-        packages=packages,
+        ext_modules=extensions,#这里是一个list，用来指定使用C/C++编写的模块，每个元素代表一个c++扩展的实例（extension）
+                               # 用来描述编译C++所需要的源文件、编译的参数、头文件路径、链接库路径等
+        cmdclass=cmdclass, # setup的操作参数，是一个字典：
+        # 'create_version_file': <class '__main__.create_version_file'>
+        # 'build': <class '__main__.build'>
+        # 'build_py': <class '__main__.build_py'>
+        # 'build_ext': <class '__main__.build_ext'>
+        # 'build_deps': <class '__main__.build_deps'>
+        # 'build_module': <class '__main__.build_module'>
+        # 'rebuild': <class '__main__.rebuild'>
+        # 'develop': <class '__main__.develop'>
+        # 'install': <class '__main__.install'>
+        # 'clean': <class '__main__.clean'>
+        # 'build_caffe2': <class '__main__.build_dep'>, 
+        # 'rebuild_caffe2': <class '__main__.rebuild_dep'
+        packages=packages,#指定项目中python源代码的路径
         entry_points=entry_points,
         install_requires=install_requires,
         package_data={
