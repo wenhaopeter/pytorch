@@ -35,6 +35,7 @@ file(GLOB C10_SRCS
         macros/*.cpp
         util/*.cpp
         )
+# message(status "================================${C10_SRCS}")
 file(GLOB_RECURSE C10_ALL_TEST_FILES test/*.cpp)
 file(GLOB_RECURSE C10_HEADERS *.h)
 add_library(c10 ${C10_SRCS} ${C10_HEADERS})

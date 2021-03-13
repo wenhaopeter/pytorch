@@ -138,6 +138,7 @@ class CMake:
 
         command = [self._cmake_command] + args
         print(' '.join(command))
+        #创建子进程，运行command命令
         check_call(command, cwd=self.build_dir, env=env)
 
     @staticmethod
@@ -342,4 +343,5 @@ class CMake:
             build_args += ['--', '/p:CL_MPCount={}'.format(max_jobs)]
         else:
             build_args += ['--', '-j', max_jobs]
+        # build_args = ['--build', '.', '--target', 'install', '--config', 'Release', '--', '-j', '12']
         self.run(build_args, my_env)

@@ -25,6 +25,9 @@ from ._six import string_classes as _string_classes
 
 from typing import Set, Type
 
+#__all__ 作用是模块级别暴露接口,如果定义了__all__，其他文件中使用from xxx import *导入该文件时，
+#只会导入 __all__ 列出的成员，可以其他成员都被排除在外。
+#控制了from xxx import *的行为，避免非下划线开头的成员被导入到环境中，弄脏当前的命名空间
 __all__ = [
     'typename', 'is_tensor', 'is_storage', 'set_default_tensor_type',
     'set_rng_state', 'get_rng_state', 'manual_seed', 'initial_seed', 'seed',
@@ -184,7 +187,7 @@ else:
     # want USE_RTLD_GLOBAL_WITH_LIBTORCH = False and USE_GLOBAL_DEPS = False
     #
     # See Note [Global dependencies]
-    if USE_GLOBAL_DEPS:
+    if USE_GLOBAL_DEPS: #USE_GLOBAL_DEPS=True
         _load_global_deps()
     from torch._C import *
 
@@ -192,11 +195,52 @@ else:
 # torch._C module initialization code in C
 if False:
     import torch._C as _C
+#dir()的作用，可以用来来列出模块定义的标识符--函数、类和变量
+#当你为dir()提供一个模块名的时候，它返回模块定义的名称列表。
 
+#如果不提供参数，它返回当前模块中定义的名称列表。
 __all__ += [name for name in dir(_C)
             if name[0] != '_' and
             not name.endswith('Base')]
-
+'''
+['typename', 'is_tensor', 'is_storage', 'set_default_tensor_type', 
+'set_rng_state', 'get_rng_state', 'manual_seed', 'initial_seed',
+ 'seed', 'save', 'load', 'set_printoptions', 'chunk', 'split', 
+ 'stack', 'matmul', 'no_grad', 'enable_grad', 'rand', 'randn', 
+ 'DoubleStorage', 'FloatStorage', 'LongStorage', 'IntStorage', 
+ 'ShortStorage', 'CharStorage', 'ByteStorage', 'BoolStorage', 
+ 'DoubleTensor', 'FloatTensor', 'LongTensor', 'IntTensor', 'ShortTensor', 
+ 'CharTensor', 'ByteTensor', 'BoolTensor', 'Tensor', 'lobpcg', 
+ 'set_deterministic', 'is_deterministic', 'AVG', 'AggregationType', 
+ 'AnyType', 'Argument', 'ArgumentSpec', 'BenchmarkConfig', 
+ 'BenchmarkExecutionStats', 'Block', 'BoolType', 'BufferDict', 
+ 'CONV_BN_FUSION', 'CallStack', 'Capsule', 'ClassType', 'Code', 
+ 'CompilationUnit', 'CompleteArgumentSpec', 'ConcreteModuleType', 
+ 'ConcreteModuleTypeBuilder', 'DeepCopyMemoTable', 'DeviceObjType', 
+ 'DictType', 'DisableTorchFunction', 'EnumType', 'ErrorReport', 
+ 'ExecutionPlan', 'ExtraFilesMap', 'FUSE_ADD_RELU', 'FatalError', 
+ 'FileCheck', 'FloatType', 'FunctionSchema', 'Future', 'FutureType', 
+ 'Generator', 'Gradient', 'Graph', 'GraphExecutorState', 
+ 'HOIST_CONV_PACKED_PARAMS', 'INSERT_FOLD_PREPACK_OPS', 
+ 'IODescriptor', 'IntType', 'InterfaceType', 'JITException', 
+ 'ListType', 'LiteScriptModule', 'LockingLogger', 'MobileOptimizerType', 
+ 'ModuleDict', 'Node', 'NoneType', 'NoopLogger', 'NumberType', 
+ 'OptionalType', 'ParameterDict', 'PyObjectType', 'PyTorchFileReader', '
+ PyTorchFileWriter', 'REMOVE_DROPOUT', 'RRefType', 'SUM', 'ScriptClass', 
+ 'ScriptFunction', 'ScriptMethod', 'ScriptModule', 'ScriptObject', 'Size', 
+ 'StaticRuntime', 'StringType', 'TensorType', 'ThroughputBenchmark', 
+ 'TracingState', 'TupleType', 'Type', 'Use', 'Value', 'autocast_decrement_nesting', 
+ 'autocast_increment_nesting', 'clear_autocast_cache', 'cpp', 'default_generator', 
+ 'device', 'dtype', 'finfo', 'fork', 'get_default_dtype', 
+ 'get_num_interop_threads', 'get_num_threads', 'has_cuda', 'has_cudnn', 
+ 'has_lapack', 'has_mkl', 'has_mkldnn', 'has_openmp', 'iinfo', 
+ 'import_ir_module', 'import_ir_module_from_buffer', 'init_num_threads', 
+ 'is_anomaly_enabled', 'is_autocast_enabled', 'is_grad_enabled', 'layout', 
+ 'memory_format', 'merge_type_from_type_comment', 'parse_ir', 
+ 'parse_schema', 'parse_type_comment', 'qscheme', 'set_anomaly_enabled', 
+ 'set_autocast_enabled', 'set_flush_denormal', 'set_grad_enabled', 
+ 'set_num_interop_threads', 'set_num_threads', 'unify_type_list', 'wait'
+'''
 ################################################################################
 # Define basic utilities
 ################################################################################
@@ -339,7 +383,7 @@ from ._tensor_str import set_printoptions
 ################################################################################
 # Define Storage and Tensor classes
 ################################################################################
-
+#定义python端的Tensor
 from .tensor import Tensor
 from .storage import _StorageBase
 
@@ -424,6 +468,9 @@ def manager_path():
 
 
 # Shared memory manager needs to know the exact location of manager executable
+##这里调用了Module.cpp里面的c++代码
+#初始化一些python的class,其中有一部分功能是添加float32 float64....这样的对象类型
+#还有FloatTensor DoubleTensor这些对象
 _C._initExtension(manager_path())
 del manager_path
 
@@ -438,6 +485,7 @@ for name in dir(_C._VariableFunctions):
     if name.startswith('__'):
         continue
     globals()[name] = getattr(_C._VariableFunctions, name)
+    #再次向__all__中添加内容，使得可以通过torch.使用
     __all__.append(name)
 
 ################################################################################
@@ -495,7 +543,7 @@ import torch.quantization
 import torch.utils.data
 import torch.__config__
 import torch.__future__
-
+#这里调用了Module.cpp里面的c++代码
 _C._init_names(list(torch._storage_classes))
 
 # attach docstrings to torch and tensor functions

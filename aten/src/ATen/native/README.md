@@ -1,3 +1,5 @@
+native是当前使用的添加算子和函数机制，之前的叫做legacy function，在TH/THC。现代的算子都在改文件
+下面，都是cpu实现。
 ATen "native" functions are the modern mechanism for adding operators and
 functions to ATen (they are "native" in contrast to legacy functions, which are bound
 via TH/THC cwrap metadata).  Native functions
@@ -15,6 +17,7 @@ functions which ingest `Variable` are made available; to use a function
 with non-differentiable tensors, wrap your tensors with `Variable` before
 passing them in.
 
+如果实现一个aten function
 The rest of this document describes how to implement an ATen function.
 
 ## Registering a function in `native_functions.yaml`

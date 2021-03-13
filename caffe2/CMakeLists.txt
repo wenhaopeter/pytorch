@@ -1,4 +1,5 @@
 # ---[ Generate and install header and cpp files
+#这里会生成cpp 和.h代码，例如tensorbody.cpp 等文件
 include(../cmake/Codegen.cmake)
 
 # ---[ Vulkan code gen
@@ -36,7 +37,7 @@ endif()
 
 # ---[ Declare source file lists
 
-# ---[ ATen build
+# ---[ ATen build aten库的编译
 if(INTERN_BUILD_ATEN_OPS)
   set(__caffe2_CMAKE_POSITION_INDEPENDENT_CODE ${CMAKE_POSITION_INDEPENDENT_CODE})
   set(CMAKE_POSITION_INDEPENDENT_CODE ON)

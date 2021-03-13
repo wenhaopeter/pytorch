@@ -656,13 +656,14 @@ void initTensorImplConversion(PyObject* module) {
 bool THPVariable_initModule(PyObject *module)
 {
   static std::vector<PyMethodDef> methods;
-  THPUtils_addPyMethodDefs(methods, torch::autograd::variable_methods);
+  THPUtils_addPyMethodDefs(methods, torch::autograd::variable_methods);//tensor的算子
   THPUtils_addPyMethodDefs(methods, extra_methods);
   THPVariableType.tp_methods = methods.data();
   if (PyType_Ready(&THPVariableType) < 0)
     return false;
   Py_INCREF(&THPVariableType);
   PyModule_AddObject(module, "_TensorBase",   (PyObject *)&THPVariableType);
+  //初始化torch._C模块中的函数，例如arange from_numpy nonzero tensor等函数，其实也是想模块中添加PyTypeObject
   torch::autograd::initTorchFunctions(module);
   torch::autograd::initTensorImplConversion(module);
   return true;

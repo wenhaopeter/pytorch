@@ -105,6 +105,7 @@ static PyObject * THPModule_initExtension(PyObject *_unused, PyObject *shm_manag
   torch::utils::initializeLayouts();
   torch::utils::initializeMemoryFormats();
   torch::utils::initializeQSchemes();
+  //这个地方为torch添加了torch.float这样的类型
   torch::utils::initializeDtypes();
   torch::tensors::initialize_python_bindings();
   std::string path = THPUtils_unpackString(shm_manager_path);
@@ -521,8 +522,17 @@ PyObject *THPModule_isEnabledXNNPACK(PyObject * /* unused */)
 }
 
 //NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
+/*
+typedef struct PyMethodDef {
+    const char  *ml_name;       // method name
+    PyCFunction  ml_meth;       // implementation function 
+    int          ml_flags;      // flags 
+    const char  *ml_doc;        // docstring
+} PyMethodDef;
+*/
 static PyMethodDef TorchMethods[] = {
   {"_initExtension",  (PyCFunction)THPModule_initExtension,   METH_O,       nullptr},
+  //初始化一些autograd的东西，例如添加python的profiler对象
   {"_autograd_init",  (PyCFunction)THPAutograd_initExtension, METH_NOARGS,  nullptr},
   {"_add_docstr",     (PyCFunction)THPModule_addDocStr,       METH_VARARGS, nullptr},
   {"_init_names",     (PyCFunction)THPModule_initNames,       METH_O,       nullptr},
@@ -628,7 +638,7 @@ PyObject* initModule() {
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define ASSERT_TRUE(cmd) if (!(cmd)) return nullptr
-
+//想methods里面push_back数据
   THPUtils_addPyMethodDefs(methods, TorchMethods);
   THPUtils_addPyMethodDefs(methods, DataLoaderMethods);
   THPUtils_addPyMethodDefs(methods, torch::autograd::python_functions());
@@ -647,13 +657,13 @@ PyObject* initModule() {
 #endif
 
   static struct PyModuleDef torchmodule = {
-     PyModuleDef_HEAD_INIT,
-     "torch._C",
-     nullptr,
-     -1,
-     methods.data()
+     PyModuleDef_HEAD_INIT, //始终将成员初始化为PyModuleDef_HEAD_INIT
+     "torch._C", //模块的名称
+     nullptr,//模块的docstring
+     -1,//不必关注
+     methods.data() ///指向模块级函数表的指针
   };
-  ASSERT_TRUE(module = PyModule_Create(&torchmodule));
+  ASSERT_TRUE(module = PyModule_Create(&torchmodule));//创建一个新的python module
   ASSERT_TRUE(THPWrapper_init(module));
   ASSERT_TRUE(THPGenerator_init(module));
   ASSERT_TRUE(THPException_init(module));

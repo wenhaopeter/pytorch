@@ -623,6 +623,7 @@ endif()
 # If a directory containing installed Caffe2 headers was inadvertently
 # added to the list of include directories, prefixing
 # PROJECT_SOURCE_DIR means this source tree always takes precedence.
+#用来指定工程的include 文件搜索路径
 include_directories(BEFORE ${PROJECT_SOURCE_DIR})
 
 # Prefix path to generated Caffe2 headers.
@@ -634,7 +635,12 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/aten/src/)
 include_directories(BEFORE ${PROJECT_BINARY_DIR}/aten/src/)
 
 # ---[ Main build
+message(STATUS "======================================================")
+# 该命令的含义的是添加一个子目录，用来指定camkelist.txt和代码所在的路径
 add_subdirectory(c10)
+#c10库可以使用在很多地方，可以使用在云端或者移动端。只保留了特定的部分函数，可以根据需要裁减库的大小，不过要失去一个函数
+
+# caffe2里面包含了aten库的编译，caffe2依赖于aten，然后会生成torch库
 add_subdirectory(caffe2)
 
 # --[ Documentation
