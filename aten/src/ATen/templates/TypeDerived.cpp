@@ -32,7 +32,7 @@ $storage_tensor_headers
 #include <torch/library.h>
 $extra_cuda_headers
 $legacy_th_headers
-
+//这个cpp文件会生成对应的CUDAType.cpp文件以及CPUType.cpp文件等，具体可以编译最后查看build/aten/src/Aten下面的文件
 namespace {
 static const char* named_tensors_unsupported_error =
   " is not yet supported with named tensors. Please drop names via "
@@ -54,7 +54,7 @@ namespace ${Type} {
 ${type_derived_method_definitions}
 
 }  // namespace ${Type}
-
+//这里会为不同类型的设备添加对应的函数实现
 TORCH_LIBRARY_IMPL(aten, ${Backend}, m) {
   ${function_registrations}
 }
