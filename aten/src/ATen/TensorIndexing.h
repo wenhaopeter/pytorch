@@ -478,7 +478,10 @@ static inline Tensor dispatch_index_put_(Tensor& self, std::vector<Tensor>&& ind
 static inline Tensor get_item(const Tensor& self, const ArrayRef<TensorIndex>& indices, bool disable_slice_optimization = false) {
   at::Device self_device = self.device();
   IntArrayRef self_sizes = self.sizes();
-
+  for (int i=0;i<indices.size();i++) {
+    std::cout<<"=====  "<<i<<"  tensor indices ======"<<std::endl;
+    std::cout<<indices[i]<<std::endl;
+  }
   // handle simple types: integers, slices, none, ellipsis, bool
   if (indices.size() == 1) {
     const TensorIndex& index = indices[0];

@@ -116,7 +116,9 @@ Library& Library::_def(c10::FunctionSchema&& schema, c10::OperatorName* out_name
   if (out_name) {
     *out_name = schema.operator_name(); // copy!
   }
-  registrars_.emplace_back(
+  registrars_.emplace_back(//这里的push_back相当于是把注册指针放在了vector里面
+    //c10::Dispatcher::singleton()是一个静态变量，相当于是一个全局变量，注意这里的Library也是被定义成了static
+    //这个全局变量会在任何函数调用之前就完成初始化的工作
     c10::Dispatcher::singleton().registerDef(
       std::move(schema),
       debugString("", file_, line_)

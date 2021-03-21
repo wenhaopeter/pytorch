@@ -1399,7 +1399,7 @@
 
 - func: _cufft_clear_plan_cache(int device_index) -> ()
   use_c10_dispatcher: full
-
+# index是对Tensor中函数的重载，Tensor?[]的含义是可选数组
 - func: index.Tensor(Tensor self, Tensor?[] indices) -> Tensor
   variants: function, method
   # NB: This function is special-cased in tools/autograd/gen_variable_type.py

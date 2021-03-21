@@ -133,8 +133,10 @@ RegistrationHandleRAII Dispatcher::registerDef(FunctionSchema schema, std::strin
   std::lock_guard<std::mutex> lock(mutex_);
 
   OperatorName op_name = schema.operator_name();
+  //这里提取到了op的name,然后查找有没有这个name，如果没有注册一个name
+  //在注册算子（调用registerImpl）的时候同样调用了这个函数，获得了OperatorHandle，和这里的op是一个对象
   auto op = findOrRegisterName_(op_name);
-
+  //Dispatcher是OperatorHandle的友元函数，所以可以直接访问对象的私有数据
   if (op.operatorIterator_->def_count == 0) {
     // NB: registerSchema is not idempotent! Only do it once!
     op.operatorIterator_->op.registerSchema(std::move(schema), std::move(debug));
@@ -193,7 +195,7 @@ void Dispatcher::deregisterDef_(const OperatorHandle& op, const OperatorName& op
 
   cleanup(op, op_name);
 }
-
+//注册算子实现对应的函数
 RegistrationHandleRAII Dispatcher::registerImpl(
   OperatorName op_name,
   c10::optional<DispatchKey> dispatch_key,

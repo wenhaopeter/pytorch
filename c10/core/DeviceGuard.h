@@ -116,6 +116,21 @@ private:
  * DeviceGuard whose original_device_ and current_device_ match, since the
  * DeviceGuard will still reset the device to original_device_.
  */
+
+//RAII是Resource Acquisition Is Initialization（wiki上面翻译成 “资源获取就是初始化”
+/*
+使用局部对象来管理资源的技术称为资源获取即初始化
+RAII，它充分的利用了C++语言局部对象自动销毁的特性来控制资源的生命周期
+整个RAII过程我总结四个步骤：
+
+a.设计一个类封装资源
+
+b.在构造函数中初始化
+
+c.在析构函数中执行销毁操作
+
+d.使用时声明一个该对象的类
+*/
 class OptionalDeviceGuard {
 public:
   /// Create an uninitialized guard.  Set the guard later using reset_device.

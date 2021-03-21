@@ -386,7 +386,7 @@ public:
   Library& def(Schema&& raw_schema) & {
     c10::FunctionSchema s = schema(std::forward<Schema>(raw_schema));
     return _def(std::move(s));
-  }
+  }//_def的实现在aten/src/ATen/core/library.cpp
 
   /// Define an operator for a schema and then register an implementation for
   /// it.  This is typically what you would use if you aren't planning
@@ -509,7 +509,7 @@ private:
   c10::optional<c10::DispatchKey> dispatch_key_;
   const char* file_;
   uint32_t line_;
-
+  //registrars_这个里面会存储schema以及对应版本的实现实现函数
   std::vector<c10::RegistrationHandleRAII> registrars_;
 
   friend class detail::TorchLibraryInit;

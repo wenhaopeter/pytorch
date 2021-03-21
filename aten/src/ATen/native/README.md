@@ -42,7 +42,7 @@ Each component is described in more detail below:
 ```
 
 The `func` entry is a string describing the name of the function and its type
-signature.
+signature签名.
 
 **Argument types.** These types are permissible as ArgType:
 

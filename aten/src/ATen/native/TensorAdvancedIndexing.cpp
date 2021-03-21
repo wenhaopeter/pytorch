@@ -253,7 +253,10 @@ static TensorIterator make_index_out_iterator(const AdvancedIndex& info, Tensor&
 
 Tensor index(const Tensor & self, TensorList indices) {
   TORCH_CHECK_INDEX(indices.size() <= (size_t)self.dim(), "too many indices for tensor of dimension ", self.dim(), " (got ", indices.size(), ")");
-
+  for (int i=0;i<indices.size();i++) {
+    std::cout<<"=====  "<<i<<"  tensor indices ======"<<std::endl;
+    std::cout<<indices[i]<<std::endl;
+  }
   auto info = make_info(self, indices);
   auto iter = make_index_iterator(info);
   index_stub(iter.device_type(), iter, info.indexed_sizes, info.indexed_strides);
