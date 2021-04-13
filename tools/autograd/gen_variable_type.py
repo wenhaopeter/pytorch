@@ -185,6 +185,7 @@ ${return_type} ${type_wrapper_name}(${formals}) ;
 
 METHOD_DEFINITION = CodeTemplate("""\
 ${return_type} ${type_wrapper_name}(${formals}) {
+  LOG_IF(WARNING, std::getenv("TRACE_INFO") != 0) << "OP_NAME: " << __FUNCTION__;
   ${type_definition_body}
 }
 """)

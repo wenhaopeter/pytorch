@@ -256,13 +256,11 @@ static inline THPObjectPtr wrapTuple(PyObject* index) {
 // 2. Python N-D getter calls C++ `at::indexing::handleDimInMultiDimIndexing`
 // for each dim, after converting Python index to C++ TensorIndex. If advanced
 // indexing is needed, it calls C++ `at::indexing::dispatch_index`.
-static int count = 0;
 PyObject* THPVariable_getitem(PyObject* self, PyObject* index) {
   HANDLE_TH_ERRORS
   auto& self_ = reinterpret_cast<THPVariable*>(self)->cdata;
   OptionalDeviceGuard device_guard(device_of(self_));
-  count++;
-  std::cout<<"调用了"<<count<<"次"<<std::endl;
+
   // handle simple types: none, ellipsis
   if (index == Py_None) {
     return THPVariable_Wrap(

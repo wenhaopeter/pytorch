@@ -9,6 +9,7 @@ from .utils import CodeTemplate, write
 
 FUNCTION_TEMPLATE = CodeTemplate("""\
 inline at::Tensor ${name}(${formals}) {
+  LOG_IF(WARNING, std::getenv("TRACE_INFO") != 0) << "OP_NAME: " << __FUNCTION__;
   at::Tensor tensor = ([&]() {
     at::AutoNonVariableTypeMode non_var_type_mode(true);
     return at::${name}(${actuals});
