@@ -15,6 +15,7 @@ namespace impl {
 // Some keys are ALWAYS considered for inclusion by default, so they are
 // included in the set here.  (const appears to be sufficient for
 // always_included to get inlined, constexpr not necessary)
+// 下面的这两个dispatch key会被一直考虑，在1.6中
 const DispatchKeySet always_included{DispatchKey::Autograd, DispatchKey::BackendSelect};
 
 // Take a DispatchKeySet for a Tensor and determine what the actual dispatch
@@ -133,12 +134,14 @@ public:
         }
       }
     });
+    LOG_IF(WARNING, 1)<<"getDispatchKeyBoxed";
     return dispatchKeySetToDispatchKey_(backendsWithoutFallthrough, DispatchKeySet::FULL, ks);
   }
 
   template<class... Args>
   DispatchKey getDispatchKeyUnboxed(DispatchKeySet backendsWithoutFallthrough, DispatchKeySet eligibleKeys, const Args&... args) const {
     auto ks = detail::multi_dispatch_key_set(args...);
+    LOG_IF(WARNING, 1)<<"getDispatchKeyUnboxed";
     return dispatchKeySetToDispatchKey_(backendsWithoutFallthrough, eligibleKeys, ks);
   }
 
@@ -194,7 +197,7 @@ private:
 
   // this is a bitset that has ones for each argument index which has to be
   // considered for dispatch. This avoids having to iterate over the stack
-  // to find all the tensors. The bits are stored in reverse order, i.e.
+  // to find all the tensors. The bits are stored in reverse order（倒序）, i.e.
   // dispatch_arg_indices_reverse_[i] == true, then the i-th argument from
   // the top of the stack (i.e. the i-th last argument of the function)
   // is relevant for dispatch.

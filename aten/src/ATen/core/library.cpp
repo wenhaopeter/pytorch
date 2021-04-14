@@ -196,6 +196,7 @@ Library& Library::_impl(const char* name_str, CppFunction&& f) & {
     ERROR_CONTEXT
   );
   auto dispatch_key = f.dispatch_key_.has_value() ? f.dispatch_key_ : dispatch_key_;
+  // LOG_IF(WARNING, 1)<<"dispatch_key:" << dispatch_key;
   registrars_.emplace_back(
     c10::Dispatcher::singleton().registerImpl(
       std::move(name),

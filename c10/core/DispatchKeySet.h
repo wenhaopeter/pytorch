@@ -8,9 +8,9 @@
 namespace c10 {
 
 // A representation of a set of DispatchKeys.  A tensor may have multiple
-// tensor type ids, e.g., a Variable tensor can also be a CPU tensor; the
+// tensor type ids（一个tensor有多个type id）, e.g., a Variable tensor can also be a CPU tensor; the
 // DispatchKeySet specifies what type ids apply.  The internal representation is
-// as a 64-bit bit set (this means only 64 tensor type ids are supported).
+// as a 64-bit bit set (this means only 64 tensor type ids are supported).内部使用64位的int数据代表
 //
 // Note that DispatchKeys are ordered; thus, we can ask questions like "what is
 // the highest priority DispatchKey in the set"?  (The set itself is not
@@ -24,6 +24,7 @@ namespace c10 {
 //
 // (The difference between variable and requires grad, is that
 // there are currently three states a tensor can be:
+//   三种tensor状态
 //  1. Not a variable
 //  2. Variable with requires_grad=False
 //  3. Variable with requires_grad=True
@@ -31,6 +32,7 @@ namespace c10 {
 // handling code if one of the inputs requires grad.)
 //
 // An undefined tensor is one with an empty tensor type set.
+// 一个空tensor的type是空的
 class DispatchKeySet final {
 public:
   enum Full { FULL };

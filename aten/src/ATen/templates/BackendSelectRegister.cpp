@@ -14,7 +14,7 @@ namespace at {
 namespace {
 
 ${backend_select_method_definitions}
-
+// 生成的文件在build/aten/src/ATen/BackendSelectRegister.cpp
 TORCH_LIBRARY_IMPL(aten, BackendSelect, m) {
   ${backend_select_function_registrations};
 }

@@ -24,6 +24,7 @@ namespace impl {
 /**
  * A KernelFunctionTable is a map from DispatchKey to a KernelFunction.
  * It can store zero or one KernelFunctions for each DispatchKey.
+ * 可以存储零个或者一个kernelfunction
  */
 class KernelFunctionTable final {
 public:
@@ -76,7 +77,7 @@ private:
  * table for various kernels provided for this operator.  For example, if we
  * consider the operator add(Tensor, Tensor), the dispatch table for this
  * operator may contain implementations for various dynamic tensor types, such
- * as CPU, CUDA, etc.
+ * as CPU, CUDA, etc.DispatchTable存贮者不同实现版本的算子
  */
 class DispatchTable final {
  public:
@@ -84,7 +85,9 @@ class DispatchTable final {
   : kernels_()
   , catchallKernel_()
   , dispatchKeyExtractor_(DispatchKeyExtractor::make(schema))
-  , operatorName_(schema.operator_name()) {}
+  , operatorName_(schema.operator_name()) {
+    LOG_IF(WARNING,1) << schema.name();
+  }
 
   // a dispatch table may be default constructed with only an
   // operator name.  Such a dispatch table is not callable until
@@ -93,7 +96,9 @@ class DispatchTable final {
   : kernels_()
   , catchallKernel_()
   , dispatchKeyExtractor_(DispatchKeyExtractor::makeUninitialized())
-  , operatorName_(std::move(op_name)) {}
+  , operatorName_(std::move(op_name)) {
+    LOG_IF(WARNING,1) << op_name.name;
+  }
 
   /**
    * Register a kernel in the table at some dispatch key.
