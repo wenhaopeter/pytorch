@@ -231,8 +231,8 @@ private:
 };
 
 /**
- * This is a handle to an operator schema registered with the dispatcher.
- * This handle can be used to register kernels with the dispatcher or
+ * This is a handle(这是一个句柄) to an operator schema registered with the dispatcher.
+ * This handle can be used to register kernels with the dispatcher or 这个句柄可以用来注册kernel或者寻找一个kernel
  * to lookup a kernel for a certain set of arguments.
  */
 class CAFFE2_API OperatorHandle {
@@ -288,8 +288,9 @@ private:
 /**
  * This is a handle to an operator schema registered with the dispatcher.
  * It holds the same information as an OperatorHandle, but it is templated
+ * 对operator对应的函数参数进行模板化
  * on the operator arguments and allows calling the operator in an
- * unboxed way.
+ * unboxed way.(unboxed way 是没有经过封装的函数调用)
  */
 template<class FuncType>
 class TypedOperatorHandle final {
@@ -323,6 +324,8 @@ template<class... Args> inline void unused_arg_(const Args&...) {}
 
 template<class Return, class... Args>
 inline Return Dispatcher::callWithDispatchKey(const TypedOperatorHandle<Return(Args...)>& op, DispatchKey dispatchKey, Args... args) const {
+  std::cout<<"dispatchKey:"<<dispatchKey <<  (int)(dispatchKey)<<std::endl;
+  LOG_IF(WARNING,1)<<"op schema name : "<<op.schema().name();
   detail::unused_arg_(args...);  // workaround for a false-positive warning about unused parameters in gcc 5
   const auto& dispatchTable = op.operatorIterator_->op.dispatch_table();
   const KernelFunction& kernel = dispatch_(dispatchTable, dispatchKey);

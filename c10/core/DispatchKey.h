@@ -6,7 +6,7 @@
 
 namespace c10 {
 
-// Semantically, a dispatch key identifies a possible "level" in our
+// Semantically在语义上, a dispatch key identifies确定了 a possible "level" in our
 // dispatch, for which a handler may be registered.  Traditional
 // backends like CPU and CUDA get dispatch keys; however, so do
 // "wrapping" layers like Variable (for autograd handling).
@@ -164,6 +164,8 @@ enum class DispatchKey : uint8_t {
   // have any "tensor" arguments.  In this case, a BackendSelect function
   // can be registered to implement the custom determination of the
   // correct backend.
+  // 在某些场景中(例如一个tensor刚创建的时候)，并不能确定当前function的backend，因为这个fuction还没有任何tensor，
+  // 在这种情况下，后端选择会被注册
   BackendSelect,
 
   // The named dispatch key is set for any tensors with named dimensions.

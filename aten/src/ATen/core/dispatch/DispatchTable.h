@@ -84,7 +84,9 @@ class DispatchTable final {
   : kernels_()
   , catchallKernel_()
   , dispatchKeyExtractor_(DispatchKeyExtractor::make(schema))
-  , operatorName_(schema.operator_name()) {}
+  , operatorName_(schema.operator_name()) {
+    LOG_IF(WARNING,1) << schema.name();
+  }
 
   // a dispatch table may be default constructed with only an
   // operator name.  Such a dispatch table is not callable until
@@ -93,7 +95,9 @@ class DispatchTable final {
   : kernels_()
   , catchallKernel_()
   , dispatchKeyExtractor_(DispatchKeyExtractor::makeUninitialized())
-  , operatorName_(std::move(op_name)) {}
+  , operatorName_(std::move(op_name)) {
+    LOG_IF(WARNING,1) << op_name.name;
+  }
 
   /**
    * Register a kernel in the table at some dispatch key.

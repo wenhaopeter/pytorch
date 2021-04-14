@@ -15,6 +15,7 @@ namespace impl {
 // Some keys are ALWAYS considered for inclusion by default, so they are
 // included in the set here.  (const appears to be sufficient for
 // always_included to get inlined, constexpr not necessary)
+// 下面的这两个dispatch key会被一直考虑，在1.6中
 const DispatchKeySet always_included{DispatchKey::Autograd, DispatchKey::BackendSelect};
 
 // Take a DispatchKeySet for a Tensor and determine what the actual dispatch

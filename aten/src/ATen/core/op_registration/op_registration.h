@@ -26,8 +26,10 @@ std::unique_ptr<FunctionSchema> inferFunctionSchemaFromFunctor() {
 
 /**
  * An instance of this class handles the registration for one or more operators.
+ * 此类的一个实例为一个或多个运算符处理注册
  * Make sure you keep the RegisterOperators instance around since it will
  * deregister the operator it's responsible for in its destructor.
+ * 确保这个实例的存在，因为它将在析构函数中注销其负责的运算符
  *
  * Example:
  *
@@ -43,6 +45,8 @@ std::unique_ptr<FunctionSchema> inferFunctionSchemaFromFunctor() {
  * >         .schema("my_op")
  * >         .kernel<my_kernel_cpu>(DispatchKey::CPU));
  */
+
+//这里的RegisterOperators还是在c10的命名空间内，在这个文件的最后面会将c10命名空间转换为torch的（通过using 类型别名的方式）
 class CAFFE2_API RegisterOperators final {
 public:
   RegisterOperators();
@@ -458,6 +462,9 @@ public:
 
     std::vector<KernelRegistrationConfig> kernels;
     optional<AliasAnalysisKind> aliasAnalysisKind_;
+    // 友元函数或者友元类是为了可以在类的外面直接访问类的私有成员，
+    // 友元函数的声明可以放在类的私有部分，也可以放在公有部分，它们是没有区别的，都说明是该类的一个友元函数。
+    // 弊端：友元的作用是提高了程序的运行效率（即减少了类型检查和安全性检查等都需要时间开销），但它破坏了类的封装性和隐藏性，使得非成员函数可以访问类的私有成员。
     friend class RegisterOperators;
     friend class Library;
   };
