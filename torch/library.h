@@ -384,6 +384,7 @@ public:
   /// ```
   template <typename Schema>
   Library& def(Schema&& raw_schema) & {
+    // 函数schema()定义在本文件中
     c10::FunctionSchema s = schema(std::forward<Schema>(raw_schema));
     return _def(std::move(s));
   }//_def的实现在aten/src/ATen/core/library.cpp
@@ -435,6 +436,7 @@ public:
   ///   m.impl("add", add_cuda);
   /// }
   /// ```
+  // 这个函数会被TypeDefault.cpp调用
   template <typename Func>
   Library& impl(const char* name, Func&& raw_f) & {
     // TODO: need to raise an error when you impl a function that has a
@@ -448,8 +450,10 @@ public:
   /// Convenience overload for directly specifying the dispatch key when
   /// impl().  You probably don't need this; instead, prefer specifying
   /// the dispatch key for the entire block in TORCH_LIBRARY_IMPL()
+  // 这个版本的函数会被CPUType CUDAType.cpp调用
   template <typename Dispatch, typename Func>
   Library& impl(const char* name, Dispatch&& key, Func&& raw_f) & {
+    // 函数dispatch()定义在本文件中
     return impl(name, dispatch(std::forward<Dispatch>(key), std::forward<Func>(raw_f)));
   }
 
@@ -531,7 +535,7 @@ private:
 public:
   TorchLibraryInit(Library::Kind kind, InitFn* fn, const char* ns, c10::optional<c10::DispatchKey> k, const char* file, uint32_t line)
     : lib_(kind, ns, k, file, line) {
-    fn(lib_);
+    fn(lib_);//这个函数里面会调用Library的def和impl函数
   }
 };
 

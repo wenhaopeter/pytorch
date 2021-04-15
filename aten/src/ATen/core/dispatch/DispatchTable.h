@@ -24,6 +24,7 @@ namespace impl {
 /**
  * A KernelFunctionTable is a map from DispatchKey to a KernelFunction.
  * It can store zero or one KernelFunctions for each DispatchKey.
+ * 可以存储零个或者一个kernelfunction
  */
 class KernelFunctionTable final {
 public:
@@ -76,7 +77,7 @@ private:
  * table for various kernels provided for this operator.  For example, if we
  * consider the operator add(Tensor, Tensor), the dispatch table for this
  * operator may contain implementations for various dynamic tensor types, such
- * as CPU, CUDA, etc.
+ * as CPU, CUDA, etc.DispatchTable存贮者不同实现版本的算子
  */
 class DispatchTable final {
  public:
