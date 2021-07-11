@@ -167,7 +167,7 @@ class Tensor(torch._C._TensorBase):
         for details on the memory layout of accumulated gradients.
 
         Arguments:
-            gradient (Tensor or None): Gradient w.r.t. the
+            gradient (Tensor or None): Gradient w.r.t.(关于的意思，查看https://www.mathsisfun.com/definitions/wrt.html) the
                 tensor. If it is a tensor, it will be automatically converted
                 to a Tensor that does not require grad unless ``create_graph`` is True.
                 None values can be specified for scalar Tensors or ones that

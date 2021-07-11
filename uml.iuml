@@ -1,0 +1,266 @@
+@startuml
+' 关联是类中包含另外的一个类，双方都知道对方的公共属性和方法，是双关联<-->.否者是单关联，-->指向被包含的那个类
+class DispatchTable {
+  ' 每一个算子都有一个DispatchTable
+  ' 可以使用{filed}和{method}来显示的定义是方法还是属性
+  ' +void setKernel(DispatchKey dispatchKey, KernelFunction kernel)
+  ' +void setCatchallKernel(KernelFunction kernel)
+  ' +const DispatchKeyExtractor& dispatchKeyExtractor()
+  ' +const OperatorName& operatorName()
+  ' +void registerSchema(const FunctionSchema& schema)
+  ' +void deregisterSchema()
+  ' +const KernelFunction* lookupCatchallKernel()
+  ' +void setManuallyBoxedKernel_(KernelFunction::InternalBoxedKernelFunction* func) {
+  -impl::KernelFunctionTable kernels_;
+  -KernelFunction catchallKernel_;
+  -DispatchKeyExtractor dispatchKeyExtractor_;
+  -OperatorName operatorName_;
+  -c10::optional<KernelFunction::InternalBoxedKernelFunction*> manuallyBoxedKernel_;
+}
+
+class KernelFunctionTable {
+  ' +explicit KernelFunctionTable()
+  ' +void setKernel(DispatchKey dispatchKey, KernelFunction kernel)
+  ' +void removeKernelIfExists(DispatchKey dispatchKey)
+  ' +const KernelFunction& operator[](DispatchKey dispatchKey) const
+  ' +KernelFunction& operator[](DispatchKey dispatchKey)
+  ' +size_t size() const
+  ' +std::string dumpState() const;
+  -{field}std::array<KernelFunction, static_cast<uint8_t>(DispatchKey::NumDispatchKeys)> kernels_;
+  -size_t kernelCount_;
+}
+
+
+class DispatchKeyExtractor  {
+
+  ' +static DispatchKeyExtractor make(const FunctionSchema& schema)
+  ' static DispatchKeyExtractor makeUninitialized()
+  ' void registerSchema(const FunctionSchema& schema)
+  ' void deregisterSchema()
+  ' DispatchKey getDispatchKeyBoxed(DispatchKeySet backendsWithoutFallthrough, const torch::jit::Stack* stack) const
+  ' template<class... Args> DispatchKey getDispatchKeyUnboxed(DispatchKeySet backendsWithoutFallthrough, DispatchKeySet eligibleKeys, const Args&... args) const
+  ' void setOperatorHasKernelForBackend(DispatchKey k, bool has_kernel);
+  ' void setOperatorHasFallthroughForBackend(DispatchKey k, bool has_fallthrough);
+  ' std::string dumpState() const;
+  ' +void checkInvariants(const FunctionSchema& schema) const;
+  ' -static c10::utils::bitset makeBitsetForDispatchArgs(const FunctionSchema& schema)
+  ' -DispatchKey dispatchKeySetToDispatchKey_(DispatchKeySet backendsWithoutFallthrough,DispatchKeySet eligibleKeys,DispatchKeySet ks) const
+  ' -explicit DispatchKeyExtractor(c10::utils::bitset dispatch_arg_indices_reverse)
+  -c10::utils::bitset dispatch_arg_indices_reverse_;
+  -DispatchKeySet operatorHasKernelForBackend_;
+  -DispatchKeySet operatorHasFallthroughForBackend_;
+}
+
+abstract class OperatorKernel{
+ virtual ~OperatorKernel() = default;
+}
+
+class DispatchKeySet{
+  uint64_t repr_;
+}
+
+class bitset{
+  -{field}bitset_type(long long int 64位) bitset_;
+}
+
+class OperatorName{
+  std::string name;
+  std::string overload_name;
+}
+
+class FunctionSchema{
+  OperatorName name_;
+  std::vector<Argument> arguments_;
+  std::vector<Argument> returns_;
+  ' // if true then this schema takes an arbitrary number of additional arguments
+  ' // after the argument specified in arguments
+  ' // currently this is used primarily to represent 'primitive' operators whose
+  ' // arguments are not checked by schema
+  bool is_vararg_;
+  bool is_varret_;
+  ' // if no alias information is directly specified, what kind of "default"
+  ' // alias information should we infer?
+  ' // NB: due to alias analysis kind merging, this may be nullopt.  Eventually
+  ' // this should always be set no matter what
+  c10::optional<AliasAnalysisKind> alias_kind_;
+}
+class KernelFunction{
+  using InternalBoxedKernelFunction = void(OperatorKernel*, const OperatorHandle&, Stack*);
+  ' // This is the public API for how boxed kernels are defined
+  using BoxedKernelFunction = void(const OperatorHandle&, Stack*);
+  std::shared_ptr<OperatorKernel> functor_;
+  InternalBoxedKernelFunction* boxed_kernel_func_;
+  void* unboxed_kernel_func_;
+}
+
+class WrapFunctionIntoFunctor_{
+}
+enum DispatchKey {
+  ' Undefined = 0,
+  ' CatchAll = Undefined,
+  ' CPU, // registered at build/aten/src/ATen/CPUType.cpp
+  ' CUDA, // registered at build/aten/src/ATen/CUDAType.cpp
+  ' HIP, // NB: I think this is not actually used, due to Note [Masquerading as
+  ' FPGA, // Xilinx support lives out of tree at https://gitlab.com/pytorch-complex/vitis_kernels
+  ' MSNPU, // unused externally, but tested at
+  ' XLA, // lives out of tree at https://github.com/pytorch/xla
+  ' Vulkan,
+  ' MKLDNN, 
+  ' OpenGL,
+  ' OpenCL,
+  ' IDEEP,
+  ' QuantizedCPU, // registered at build/aten/src/ATen/QuantizedCPUType.cpp
+  ' QuantizedCUDA, // registered at build/aten/src/ATen/QuantizedCUDAType.cpp
+  ' ComplexCPU, // lives out of tree at
+  '             ' // https://gitlab.com/pytorch-complex/pytorch-cpu-strided-complex
+  ' ComplexCUDA, // and
+  '             '  // https://gitlab.com/pytorch-complex/pytorch-cuda-strided-complex
+  ' CustomRNGKeyId,
+  ' MkldnnCPU, // registered at build/aten/src/ATen/MkldnnCPUType.cpp
+  ' SparseCPU, // registered at build/aten/src/ATen/SparseCPUType.cpp
+  ' SparseCUDA, // registered at build/aten/src/ATen/SparseCUDAType.cpp
+  ' SparseHIP, // TODO: I think this is not actually used, due to Note
+  ' PrivateUse1,
+  ' PrivateUse2,
+  ' PrivateUse3,
+  ' Meta,
+  ' BackendSelect,
+  ' Named,
+  ' Autograd,
+  ' Profiler,
+  ' Tracer,
+  ' XLAPreAutograd,
+  ' Autocast,
+  ' PrivateUse1_PreAutograd,
+  ' PrivateUse2_PreAutograd,
+  ' PrivateUse3_PreAutograd,
+  ' Batched,
+  ' TESTING_ONLY_GenericWrapper,
+  ' TESTING_ONLY_GenericMode,
+  ' NumDispatchKeys, // Sentinel
+  ' CPUTensorId = CPU,
+  ' CUDATensorId = CUDA,
+}
+
+class Dispatcher {
+  ' 在pytorch中这个类的对象只有一个，因为采用的是单利模式
+  KernelFunction dispatch_(const DispatchTable& dispatchTable, DispatchKey dispatchKey)
+  void callBoxed(const OperatorHandle& op, Stack* stack) 
+  std::list<OperatorDef> operators_;
+  LeftRight<ska::flat_hash_map<OperatorName, OperatorHandle>> operatorLookupTable_;
+  ' // Map from namespace to debug string (saying, e.g., where the library was defined)
+  ska::flat_hash_map<std::string, std::string> libraries_;
+  impl::KernelFunctionTable backendFallbackKernels_;
+  ' // Set of backends which have specified they do NOT want fallthrough behavior
+  ' // (we store the inverse because it avoids a negation when we use this for
+  ' // masking)
+  DispatchKeySet backendsWithoutFallthrough_;
+  std::unique_ptr<detail::RegistrationListenerList> listeners_;
+  std::mutex mutex_;
+}
+
+class OperatorDef {
+  impl::OperatorEntry op;
+  size_t def_count = 0;
+  size_t def_and_impl_count = 0;
+}
+
+class OperatorHandle {
+  std::list<Dispatcher::OperatorDef>::iterator operatorIterator_;
+}
+class TypedOperatorHandle{
+  friend class OperatorHandle;  
+}
+class OperatorEntry {
+  OperatorName name_;
+  c10::optional<FunctionSchema> schema_;
+  c10::optional<std::string> debug_;
+  ' // INVARIANT: schema_.has_value() == debug_.has_value()
+  ' // The dispatchTable stores the current kernel for each dispatch key
+  DispatchTable dispatchTable_;
+  ska::flat_hash_map<c10::optional<DispatchKey>, std::list<KernelEntry>> kernels_;
+  std::mutex kernelsMutex_; // protects kernels_
+  c10::optional<CppSignature> cpp_signature_;
+}
+
+class RegistrationHandleRAII {
+  {field}std::function<void()> onDestruction_;
+}
+
+class RegistrationListenerList {
+  {field}std::list<std::unique_ptr<OpRegistrationListener>> listeners_;
+}
+class KernelEntry {
+  KernelFunction kernel;
+  std::unique_ptr<FunctionSchema> inferred_function_schema;
+  std::string debug;
+}
+class CppSignature{
+  std::type_index signature_;
+}
+
+class RegisterOperators{
+  void registerOp_(Options&& options)
+  std::vector<RegistrationHandleRAII> registrars_;
+}
+class Options{
+  c10::optional<c10::either<OperatorName, FunctionSchema>> schemaOrName_;
+  std::vector<KernelRegistrationConfig> kernels;
+  optional<AliasAnalysisKind> aliasAnalysisKind_;
+  friend class RegisterOperators;
+  friend class Library;
+}
+enum Kind {
+    DEF, 
+    IMPL,
+    FRAGMENT,
+}
+class Library {
+  Kind kind_;
+  c10::optional<std::string> ns_;
+  c10::optional<c10::DispatchKey> dispatch_key_;
+  const char* file_;
+  uint32_t line_;
+  ' //registrars_这个里面会存储schema以及对应版本的实现实现函数
+  std::vector<c10::RegistrationHandleRAII> registrars_;
+  friend class detail::TorchLibraryInit;
+}
+class TorchLibraryInit {
+  ' using InitFn = void(Library&);
+  Library lib_;
+  TorchLibraryInit(Library::Kind kind, InitFn* fn, const char* ns, c10::optional<c10::DispatchKey> k, const char* file, uint32_t line)
+}
+DispatchTable-->KernelFunction
+DispatchTable-->DispatchKeyExtractor
+DispatchTable-->OperatorName
+DispatchTable-->KernelFunctionTable
+KernelFunctionTable-->KernelFunction
+DispatchKeyExtractor-->DispatchKeySet
+DispatchKeyExtractor-->bitset
+KernelFunction-->OperatorKernel
+FunctionSchema-->OperatorName
+WrapFunctionIntoFunctor_..|>OperatorKernel
+Dispatcher-->OperatorDef
+Dispatcher-->OperatorHandle
+Dispatcher-->RegistrationListenerList
+Dispatcher-->OperatorName
+Dispatcher-->KernelFunctionTable
+Dispatcher-->DispatchKeySet
+OperatorDef-->OperatorEntry
+OperatorHandle-->OperatorDef
+OperatorHandle<|--TypedOperatorHandle
+OperatorEntry-->DispatchTable
+OperatorEntry-->OperatorName
+OperatorEntry-->FunctionSchema
+OperatorEntry-->DispatchKey
+OperatorEntry-->KernelEntry
+OperatorEntry-->CppSignature
+KernelEntry-->KernelFunction
+KernelEntry-->FunctionSchema
+RegisterOperators-->RegistrationHandleRAII
+' RegisterOperators<<friend>>Options
+Library-->DispatchKey
+Library-->RegistrationHandleRAII
+Library-->Kind
+TorchLibraryInit-->Library
+@enduml
