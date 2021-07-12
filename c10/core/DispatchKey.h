@@ -183,12 +183,13 @@ enum class DispatchKey : uint8_t {
   Named,
 
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~ AUTOGRAD ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
-  // All backends are oblivious to autograd; autograd is handled as a
-  // layer which happens on top of all backends.  It inspects the autograd
+  // All backends are oblivious（未察觉） to autograd; autograd is handled as a
+  // layer which happens on top of all backends.  It inspects（查看） the autograd
   // metadata of all inputs, determines what autograd metadata should be
-  // constructed by the output, and otherwise defers to the backend to
-  // actually do the numeric computation.  Autograd contains
+  // constructed by the output, and otherwise defers（推迟） to the backend to
+  // actually do the numeric（数字） computation.  Autograd contains
   // the bulk of this logic.
+  // 所有的backend都是不察觉autograd的，autograd被处理成一个layer，在所有的backend之前。
   Autograd,
 
   Profiler,
