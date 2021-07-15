@@ -86,7 +86,6 @@ class DispatchTable final {
   , catchallKernel_()
   , dispatchKeyExtractor_(DispatchKeyExtractor::make(schema))
   , operatorName_(schema.operator_name()) {
-    LOG_IF(WARNING,1) << schema.name();
   }
 
   // a dispatch table may be default constructed with only an
@@ -97,7 +96,6 @@ class DispatchTable final {
   , catchallKernel_()
   , dispatchKeyExtractor_(DispatchKeyExtractor::makeUninitialized())
   , operatorName_(std::move(op_name)) {
-    LOG_IF(WARNING,1) << op_name.name;
   }
 
   /**

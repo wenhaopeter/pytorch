@@ -14,7 +14,7 @@ namespace c10 {
 // In implementation terms, the dispatch key identifies a specific "bit" in a
 // DispatchKeySet.  Higher bit indexes get handled by dispatching first (because
 // we "count leading zeros" when we extract the highest priority dispatch
-// key.)
+// key.)高比特位的优先级最高,低比特位的优先级最低
 enum class DispatchKey : uint8_t {
 
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~ UNDEFINED ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
@@ -48,6 +48,7 @@ enum class DispatchKey : uint8_t {
 
   // Here are backends which you think of as traditionally specifying
   // how to implement operations on some device.
+  //优先级最低
   CPU, // registered at build/aten/src/ATen/CPUType.cpp
   CUDA, // registered at build/aten/src/ATen/CUDAType.cpp
   HIP, // NB: I think this is not actually used, due to Note [Masquerading as

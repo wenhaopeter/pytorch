@@ -324,8 +324,8 @@ template<class... Args> inline void unused_arg_(const Args&...) {}
 
 template<class Return, class... Args>
 inline Return Dispatcher::callWithDispatchKey(const TypedOperatorHandle<Return(Args...)>& op, DispatchKey dispatchKey, Args... args) const {
-  std::cout<<"dispatchKey:"<<dispatchKey <<  (int)(dispatchKey)<<std::endl;
   LOG_IF(WARNING,1)<<"op schema name : "<<op.schema().name();
+  LOG_IF(WARNING,1)<<"op schema DispatchKey : "<<dispatchKey;
   detail::unused_arg_(args...);  // workaround for a false-positive warning about unused parameters in gcc 5
   const auto& dispatchTable = op.operatorIterator_->op.dispatch_table();
   const KernelFunction& kernel = dispatch_(dispatchTable, dispatchKey);

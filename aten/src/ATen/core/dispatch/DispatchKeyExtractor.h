@@ -78,6 +78,7 @@ namespace detail {
     template <typename T>
     void operator()(const T& x) {
       // do nothing
+      // 如果参数不是tensor或者generator的话,则什么也不会做,这时的DispatchKeySet.raw_repr()为0
     }
   };
 
@@ -134,14 +135,12 @@ public:
         }
       }
     });
-    LOG_IF(WARNING, 1)<<"getDispatchKeyBoxed";
     return dispatchKeySetToDispatchKey_(backendsWithoutFallthrough, DispatchKeySet::FULL, ks);
   }
 
   template<class... Args>
   DispatchKey getDispatchKeyUnboxed(DispatchKeySet backendsWithoutFallthrough, DispatchKeySet eligibleKeys, const Args&... args) const {
     auto ks = detail::multi_dispatch_key_set(args...);
-    LOG_IF(WARNING, 1)<<"getDispatchKeyUnboxed";
     return dispatchKeySetToDispatchKey_(backendsWithoutFallthrough, eligibleKeys, ks);
   }
 
